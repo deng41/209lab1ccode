@@ -958,7 +958,7 @@ void vecalw(double wc, double xc, double yc, double zc, double sx, double sy, do
 	t1 = ai*cos(ddi*PI / 180);
 
 
-	xx = r11*sx + r12*sy + r13*sz + t1;
+	xx = r11*sx + r12*sy + r13*sz + t1;// position x
 	yy = r21*sx + r22*sy + r23*sz + t2;
 	zz = r31*sx + r32*sy + r33*sz + t3;
 
