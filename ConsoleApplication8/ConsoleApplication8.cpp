@@ -1,3 +1,35 @@
+/* PLEASE READ
+	
+	This Lab 1 Assignment is completed by Chenkai(Tim) Ling and Tianyu Deng 
+
+	Both student contribute to the code.
+
+	Chenkai(Tim) Ling contribution:
+
+	1. Build user interface for input and command
+	2. Implement and create forward kinematics method with Tianyu deng
+	3. Implement and create inverse kinematics method with Tianyu deng
+	4. Write functions for matrix and parameter calculation.
+
+	Tianyu Deng contribution:
+
+	1. Design and prove inverse kinematic algorithm with Tim
+	2. Debug and improve the performance of code
+	3. Calculate forward kinematic algorithm 
+	4. Provide github account and repository 
+
+	*/
+
+
+
+
+
+
+
+
+
+
+
 // ConsoleApplication8.cpp : Defines the entry point for the console application.
 //
 
@@ -166,6 +198,7 @@ void vecalw(double wc, double xc, double yc, double zc, double sx, double sy, do
 int main()
 {
 	while (1) {
+		//Get user input
 		std::cout.precision(5);
 		cout << "Welcome to ICT 4 link robotic arm FK and IK calculation " << endl;
 		cout << "Pick FK or IK option " << endl;
@@ -188,8 +221,35 @@ int main()
     return 0;
 }
 
-void FK(void)
+
+/* In this section, it starts with getting original position from user. Then it asks user to 
+input four D-H parameters. Base on D-H parameters, the code generates a D-H matrix. This D-H matrix
+is displayed on the screen. Then the code do matrix multiplication to update T matrix every time 
+it moves to next link. The updated/calculated T matrix is referenced to origin point. Therefore, 
+user can have a clear picture at where the joint is relate to world frame. 
+
+Detail procedure is as following:
+
+Input origin point
+Input 4 D-H parameter 
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+void FK(void)//forward calculation
 {
+	
 	cout << "You are doing FK Calculation" << endl << endl;
 	cout << "Please enter number of links of the machine" << endl;
 	cout << "Number of links =  ";
@@ -202,6 +262,8 @@ void FK(void)
 	cin >> y;
 	cout << "z =  ";
 	cin >> z;
+
+	
 
 	while (link >= 1)
 	{
