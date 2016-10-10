@@ -232,20 +232,13 @@ Detail procedure is as following:
 
 Input origin point
 Input 4 D-H parameter 
+Calculating current D-H matrix reference to last state
+Calculating D-H matrix reference to original/world frame
+Calculating joint position reference to world frame.
 
 
 
 */
-
-
-
-
-
-
-
-
-
-
 
 void FK(void)//forward calculation
 {
@@ -264,7 +257,7 @@ void FK(void)//forward calculation
 	cin >> z;
 
 	
-
+	//Loop for calculating link number bigger than 1
 	while (link >= 1)
 	{
 
@@ -307,7 +300,6 @@ void FK(void)//forward calculation
 			nn3t = n3t;
 		}
 		vecal(ddi, aai, ai, di, x, y, z);
-		//Store old matrix elements.
 		
 		if (i == 1)
 		{
@@ -343,6 +335,30 @@ void FK(void)//forward calculation
 		i++;
 	}
 }
+
+/* In this function
+
+User choose to see only position of joints or trajectory of whole arm movement.
+
+Only position:
+Input origin.
+Confirm within range of reach. 
+Use distance between end-effector and joint 2 to decide types of link configuration.
+In each link configuration calculate joint angles.
+Use joint angles and other 3 D-H parameters to generatre D-H matrix.
+Update Matrix to world frame.
+Use forward kinematics to confirm the correctness of joint configuration.
+
+Trajectory:
+Use deltax to update end-effector position as it moves. 
+End-effector position x move in a linear and shortest path as deltax increasing. 
+Show joint position to the screen
+
+
+*/
+
+
+
 void IK(void)
 {
 	choice = 0;
@@ -359,6 +375,7 @@ void IK(void)
 	cout << "Enter 1 for Joint position calculation.  2 for trajectory calculation" << endl;
 	cin >> choice;
 
+	//This calculate only position
 	if (choice == 1)
 	{
 		cout << "Please enter end-effector position (x,y,z)" << endl;
@@ -383,7 +400,7 @@ void IK(void)
 
 		maxdistance = 20 * cos(45 * PI / 180) + 40 + 20 + 20;
 		tdistance = sqrt((enx - inx)*(enx - inx) + (eny - iny)*(eny - iny) + (enz - inz)*(enz - inz));
-
+		//if it is in range of reach
 		if (tdistance > maxdistance)
 		{
 			cout << "Error! too far for robotic arm to reach, max distance is " << maxdistance << endl;
@@ -395,21 +412,24 @@ void IK(void)
 		redistance = sqrt((enx - lp1x)*(enx - lp1x) + (eny - lp1y)*(eny - lp1y) + (enz - lp1z)*(enz - lp1z));
 
 
-
+		//calculating distance
 		if ((enx*enx + eny*eny) > (lp1x*lp1x + lp1y*lp1y))
 		{
+			//distance smaller than 40 cm
 			if (redistance < 40)
 			{
 				dd2 = -atan((enz - lp1z) / sqrt((enx - lp1x)*(enx - lp1x) + (eny - lp1y)*(eny - lp1y))) / PI * 180;
 				dd3 = 180 - acos((40 - redistance) / 2 / 20) * 180 / PI;
 				dd4 = 2 * acos((40 - redistance) / 2 / 20) * 180 / PI;
 			}
+			//distance equal to 40 cm
 			else if (redistance == 40)
 			{
 				dd2 = -atan((enz - lp1z) / sqrt((enx - lp1x)*(enx - lp1x) + (eny - lp1y)*(eny - lp1y))) / PI * 180;
 				dd3 = 180;
 				dd4 = 180;
 			}
+			//distance bigger than 40 cm
 			else if (redistance > 40)
 			{
 				dd2 = -atan((enz - lp1z) / sqrt((enx - lp1x)*(enx - lp1x) + (eny - lp1y)*(eny - lp1y))) / PI * 180;
@@ -418,6 +438,7 @@ void IK(void)
 			}
 
 		}
+		//if end-effector is under link 1. special case configuration.
 		if ((enx*enx+eny*eny) < (lp1x*lp1x+lp1y*lp1y))
 		{
 			if (enz < 14.1421)
@@ -450,7 +471,7 @@ void IK(void)
 		a4 = 20;
 		aa4 = 0;
 
-
+		//calculating and updating matrix to world frame
 		cout << "Your T0-1 looks like" << endl;
 		vecal(dd1, aa1, a1, d1, 0, 0, 0);
 		nn11 = r11;
@@ -532,6 +553,7 @@ void IK(void)
 
 	if (choice == 2)
 	{
+		//same as choice 1 but showing the joint position it moves.
 		cout << std::fixed;
 		int ii = 0;
 		cout << "Please enter present end-effector position (x,y,z)" << endl;
@@ -728,19 +750,9 @@ void IK(void)
 			deltax--;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
 	}
+
+	//This is only for testing purpose. Oh and too bad if you input choice = 30000 =p.
 
 	if (choice == 30000)
 	{
@@ -924,6 +936,9 @@ void IK(void)
 
 
 }
+
+//matric calculation  of D-H parameters to D-H matrix
+
 void vecal(double wc, double xc, double yc, double zc, double sx, double sy, double sz)
 {
 	ddi = wc;
@@ -967,6 +982,8 @@ void vecal(double wc, double xc, double yc, double zc, double sx, double sy, dou
 
 	return ;
 }
+//Matrix multiplication of 4x4 D-H matrix
+
 void MatrixTMatrix(double rr11, double rr12, double rr13, double rt1, double rr21, double rr22, double rr23, double rt2, double rr31, double rr32, double rr33, double rt3, double nr11, double nr12, double nr13, double nt1, double nr21, double nr22, double nr23, double nt2, double nr31, double nr32, double nr33, double nt3)
 {
 	n11 = rr11*nr11 + rr12*nr21 + rr13*nr31;
@@ -986,6 +1003,8 @@ void MatrixTMatrix(double rr11, double rr12, double rr13, double rt1, double rr2
 
 	return ;
 }
+//Matrix multiplication of 4x4 D-H matrix with (x,y,z,1) position
+
 void MatrixTVec(double rr11, double rr12, double rr13, double rt1, double rr21, double rr22, double rr23, double rt2, double rr31, double rr32, double rr33, double rt3, double npx, double npy, double npz)
 {
 	xx = rr11*npx + rr12*npy + rr13*npz + rt1;
@@ -994,6 +1013,7 @@ void MatrixTVec(double rr11, double rr12, double rr13, double rt1, double rr21, 
 	return ;
 
 }
+//same as vecal but in here, matrix is not print to screen. This is only used in joint trajectory
 
 void vecalw(double wc, double xc, double yc, double zc, double sx, double sy, double sz)
 {
